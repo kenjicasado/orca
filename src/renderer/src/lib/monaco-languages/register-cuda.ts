@@ -34,6 +34,7 @@ export const cudaLanguageConfiguration: Monaco.languages.LanguageConfiguration =
   ]
 }
 
+/** Resolves the vendored CUDA grammar, and its `source.cpp` fallback, for {@link registerCudaLanguage}. */
 export async function loadCudaTextMateGrammar(scopeName: string): Promise<IRawGrammar | null> {
   if (scopeName === CUDA_TEXTMATE_SCOPE) {
     // Why: CUDA highlighting uses the kriegalex/vscode-cuda TextMate grammar
@@ -57,6 +58,7 @@ export async function loadCudaTextMateGrammar(scopeName: string): Promise<IRawGr
   return null
 }
 
+/** Registers `.cu`/`.cuh` as the `cuda` Monaco language, backed by the vendored TextMate grammar. */
 export function registerCudaLanguage(monaco: MonacoModule): void {
   registerTextMateLanguage(monaco, {
     language: {
@@ -69,3 +71,8 @@ export function registerCudaLanguage(monaco: MonacoModule): void {
     loadGrammar: loadCudaTextMateGrammar
   })
 }
+
+// Note: the vendored C++ grammar references the external scope
+// source.cpp.embedded.macro, which nothing registers, so #define macro bodies
+// only get the coarse meta.preprocessor.macro.cpp scope with no internal
+// tokenization. Known limitation of the vendored grammar, not fixable here.
